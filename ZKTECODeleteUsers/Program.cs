@@ -32,7 +32,7 @@ namespace ZKTECODeleteUsers
 
             for (int i = 0; i < relojes.Length; i++)
             {
-                AssignNameToUserIntoWatch(relojes[i]);
+                //AssignNameToUserIntoWatch(relojes[i]);
                 //DeleteFiredUsersIntoWatch(relojes[i]);
             }
 
