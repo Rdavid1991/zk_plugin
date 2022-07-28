@@ -15,6 +15,9 @@ namespace ZKTECODeleteUsers
         static void Main(string[] args)
         {
 
+            string[] arg = Environment.GetCommandLineArgs();
+            string command = string.Join(" ", arg);
+
             string[] relojes = {
                 //"10.102.1.191",   // cafeteria
                 //"10.104.7.242",   // Principal 1
@@ -30,8 +33,28 @@ namespace ZKTECODeleteUsers
                 //"10.104.6.201" //Almacen
             };
 
+            if (Regex.IsMatch(command, @"(?<=sync-time).*?\z"))
+            {
+                CommandSyncTime cst = new CommandSyncTime(command);
+                relojes = cst.ExecuteCommand();
+                for (int i = 0; i < relojes.Length; i++)
+                {
+                    SyncTimeIntoWatch(relojes[i].Trim());
+                }
+            }else if (Regex.IsMatch(command, @"(?<=delete-fired-user).*?\z"))
+            {
+                DeleteFiredUserCommand dfuc = new DeleteFiredUserCommand(command);
+                relojes = dfuc.ExecuteCommand();
+                for (int i = 0; i < relojes.Length; i++)
+                {
+                    DeleteFiredUsersIntoWatch(relojes[i]);
+                }
+            }
+
             for (int i = 0; i < relojes.Length; i++)
             {
+
+
                 //AssignNameToUserIntoWatch(relojes[i]);
                 //DeleteFiredUsersIntoWatch(relojes[i]);
             }
@@ -50,6 +73,13 @@ namespace ZKTECODeleteUsers
             DeleteFiredUser df = new DeleteFiredUser(ip);
             df.Init();
             df.End();
+        }
+
+        static void SyncTimeIntoWatch(string ip)
+        {
+            SyncTime st = new SyncTime(ip);
+            st.Init();
+            st.End();
         }
 
         static void getFinger()

@@ -52,7 +52,7 @@ namespace ZKTECODeleteUsers
             {
                 GetUserNameFromDataBase();
                 PutNameIntoCock();
-                SetNameToUser();
+                //SetNameToUser();
             }
         }
 

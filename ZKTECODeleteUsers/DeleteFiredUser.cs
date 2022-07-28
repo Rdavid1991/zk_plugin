@@ -11,10 +11,8 @@ namespace ZKTECODeleteUsers
 
         zkemkeeper.CZKEM zk;
         readonly string ip;
-        readonly int port = 4370;
-        readonly int iMachineNumber = 1;
-        bool connected;
-
+        int iMachineNumber;
+        Device d = new Device();
 
         List<string> codes, watchCodes;
         string where;
@@ -26,24 +24,18 @@ namespace ZKTECODeleteUsers
 
         public void Init()
         {
-            Console.WriteLine("Abre todo");
-            this.zk = new zkemkeeper.CZKEM();
-            this.zk.SetCommPassword(573757);
-            this.connected = zk.Connect_Net(this.ip, this.port);
-            this.zk.EnableDevice(this.iMachineNumber, false);
-            if (this.connected)
+            DeviceState response = d.Connect(this.ip);
+            if (response.connected)
             {
-                Console.WriteLine("Conectado -" + this.ip);
+                this.iMachineNumber = response.iMachineNumber;
+                zk = response.zk;
                 SearchUser();
             }
         }
 
         public void End()
         {
-            Console.WriteLine("Cierra todo *********************");
-
-            zk.EnableDevice(iMachineNumber, true);
-            zk.Disconnect();
+            d.Disconnect(zk);
         }
 
         public void SearchUser()
@@ -51,7 +43,7 @@ namespace ZKTECODeleteUsers
             var dateAndTime = DateTime.Now;
             var Date = dateAndTime.ToLongDateString();
 
-            string archivo = "\nUsuarios borrados - " + Date +"\n\n";
+            string archivo = "\nUsuarios borrados - " + Date + "\n\n";
             int borrados = 0;
             archivo += this.ip + "\n";
             string[] usuarios = { };
@@ -103,25 +95,19 @@ namespace ZKTECODeleteUsers
             rdr.Close();
         }
 
-        private bool GetUsersFromClock()
+        private void GetUsersFromClock()
         {
             this.where = "\nWHERE";
             this.watchCodes = new List<string> { };
-            if (this.connected)
+
+            this.zk.ReadAllUserID(this.iMachineNumber);
+            while (this.zk.SSR_GetAllUserInfo(this.iMachineNumber, out string iEnrollNumber, out string iName, out string iPassword, out int iPrivilege, out bool iEnabled))
             {
-                this.zk.ReadAllUserID(this.iMachineNumber);
-                while (this.zk.SSR_GetAllUserInfo(this.iMachineNumber, out string iEnrollNumber, out string iName, out string iPassword, out int iPrivilege, out bool iEnabled))
-                {
-                    where += "\ncode='" + iEnrollNumber + "' OR";
-
-                    watchCodes.Add(iEnrollNumber);
-                }
-
-                where = where.Substring(0, where.Length - 2);
-
-                return true;
+                where += "\ncode='" + iEnrollNumber + "' OR";
+                watchCodes.Add(iEnrollNumber);
             }
-            return false;
+
+            where = where.Substring(0, where.Length - 2);
         }
     }
 
