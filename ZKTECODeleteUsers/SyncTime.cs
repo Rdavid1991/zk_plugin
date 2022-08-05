@@ -36,7 +36,7 @@ namespace ZKTECODeleteUsers
         {
 
             bool synchronized = false;
-            //synchronized = this.zk.SetDeviceTime(1);
+            synchronized = this.zk.SetDeviceTime(this.iMachineNumber);
 
             if (synchronized)
             {

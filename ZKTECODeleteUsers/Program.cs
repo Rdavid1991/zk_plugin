@@ -49,16 +49,21 @@ namespace ZKTECODeleteUsers
                 {
                     DeleteFiredUsersIntoWatch(relojes[i]);
                 }
-            }
-
-            for (int i = 0; i < relojes.Length; i++)
+            }else if(Regex.IsMatch(command, @"(?<=change-name-user).*?\z"))
             {
-
-
-                //AssignNameToUserIntoWatch(relojes[i]);
-                //DeleteFiredUsersIntoWatch(relojes[i]);
+                AssignNameToUserCommand anuc = new AssignNameToUserCommand(command);
+                relojes = anuc.ExecuteCommand();
+                for (int i = 0; i < relojes.Length; i++)
+                {
+                    AssignNameToUserIntoWatch(relojes[i]);
+                }
+            }else
+            {
+                Console.WriteLine("#Options");
+                Console.WriteLine("#\tsync-time\t\ta");
+                Console.WriteLine("#\tdelete-fired-user\t\ta");
+                Console.WriteLine("#\tchange-name-user\t\ta");
             }
-
         }
 
         public static void AssignNameToUserIntoWatch(string reloj)

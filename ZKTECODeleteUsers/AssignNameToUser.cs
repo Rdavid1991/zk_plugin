@@ -12,10 +12,9 @@ namespace ZKTECODeleteUsers
 
         zkemkeeper.CZKEM zk;
         readonly string ip;
-        readonly int port = 4370;
         readonly int iMachineNumber = 1;
         bool connected;
-
+        Device d = new Device();
 
         List<Users> list;
         List<DbUser> listNames;
@@ -28,20 +27,18 @@ namespace ZKTECODeleteUsers
 
         public void Init()
         {
-            Console.WriteLine("Abre todo");
-            this.zk = new zkemkeeper.CZKEM();
-            this.zk.SetCommPassword(573757);
-            this.connected = zk.Connect_Net(this.ip, this.port);
-            this.zk.EnableDevice(this.iMachineNumber, false);
-            ChangeNameUserIntoClock();
+            DeviceState response = d.Connect(this.ip);
+            this.connected = response.connected;
+            if (this.connected)
+            {
+                this.zk = response.zk;
+                ChangeNameUserIntoClock();
+            }
         }
 
         public void End()
         {
-            Console.WriteLine("Cierra todo *********************");
-
-            zk.EnableDevice(iMachineNumber, true);
-            zk.Disconnect();
+            d.Disconnect(this.zk);
         }
 
         public void ChangeNameUserIntoClock()
@@ -52,7 +49,7 @@ namespace ZKTECODeleteUsers
             {
                 GetUserNameFromDataBase();
                 PutNameIntoCock();
-                //SetNameToUser();
+                SetNameToUser();
             }
         }
 
